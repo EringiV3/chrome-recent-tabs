@@ -1,0 +1,14 @@
+{
+  "name": "recent-tabs-switcher",
+  "version": "1.0.0",
+  "description": "Switch between recently active tabs using an elegant overlay.",
+  "main": "dist/background.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "typescript": "^5.4.5"
+  }
+}
