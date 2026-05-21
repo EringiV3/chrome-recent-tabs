@@ -26,8 +26,6 @@ interface SwitcherSettings {
   let selectedIndex = 0;
   let isOpen = false;
   let openedTime = 0;
-  let isAltPressed = false;
-  let lastAltReleasedTime = 0;
 
   // デフォルトファビコン（マテリアルアイコン風の綺麗なプレースホルダーSVGデータURL）
   const DEFAULT_FAVICON =
@@ -60,20 +58,8 @@ interface SwitcherSettings {
     // タブが1つの場合はインデックス0を選択する。
     selectedIndex = tabs.length > 1 ? 1 : 0;
 
-    // メッセージ受信時にすでにAltキーが離されているか、または直前に離された場合は、
-    // ユーザーが素早く「押してすぐ離した（一発切り替え）」とみなす。
-    const now = Date.now();
-    const isQuickToggle = !isAltPressed || now - lastAltReleasedTime < 200;
-
-    if (isQuickToggle) {
-      // モーダルを表示せず、即座にターゲットタブに切り替えて終了する
-      const targetTabId = tabs[selectedIndex].id;
-      chrome.runtime.sendMessage({ action: 'switch_to_tab', tabId: targetTabId });
-      return;
-    }
-
     isOpen = true;
-    openedTime = now;
+    openedTime = Date.now();
 
     // カスタムエレメントの作成または取得
     let customEl = document.getElementById('recent-tabs-switcher-root') as HTMLElement | null;
@@ -317,12 +303,9 @@ interface SwitcherSettings {
    * キーボードのキー押下時のハンドラー（キャプチャリングフェーズで実行）
    */
   function handleKeyDown(event: KeyboardEvent): void {
-    const key = event.key;
-    if (key === 'Alt') {
-      isAltPressed = true;
-    }
-
     if (!isOpen) return;
+
+    const key = event.key;
 
     // イベントがスイッチャーに向けられていることを示すため伝播停止
     event.stopPropagation();
@@ -368,13 +351,9 @@ interface SwitcherSettings {
    * キーボードのキー解放時のハンドラー
    */
   function handleKeyUp(event: KeyboardEvent): void {
-    const key = event.key;
-    if (key === 'Alt') {
-      isAltPressed = false;
-      lastAltReleasedTime = Date.now();
-    }
-
     if (!isOpen) return;
+
+    const key = event.key;
 
     event.stopPropagation();
     event.preventDefault();
@@ -395,7 +374,6 @@ interface SwitcherSettings {
    * キーイベントのロストを防ぐため、安全にスイッチャーを閉じる
    */
   function handleWindowBlur(): void {
-    isAltPressed = false;
     if (!isOpen) return;
 
     // 起動直後 150ms 以内の blur は、ショートカット起動に伴うウィンドウフォーカスの揺らぎとして無視する
