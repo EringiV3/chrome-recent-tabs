@@ -3,11 +3,16 @@
 interface SwitcherSettings {
   maxTabs?: number;
   theme?: string;
+  layout?: 'vertical' | 'horizontal';
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   const maxTabsInput = document.getElementById('max-tabs') as HTMLInputElement | null;
   const maxTabsValLabel = document.getElementById('max-tabs-val') as HTMLSpanElement | null;
+  const layoutVerticalInput = document.getElementById('layout-vertical') as HTMLInputElement | null;
+  const layoutHorizontalInput = document.getElementById(
+    'layout-horizontal',
+  ) as HTMLInputElement | null;
   const saveBtn = document.getElementById('save-btn') as HTMLButtonElement | null;
   const statusEl = document.getElementById('status') as HTMLDivElement | null;
   const openShortcutBtn = document.getElementById(
@@ -29,6 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (saveBtn && maxTabsInput) {
     saveBtn.addEventListener('click', async () => {
       const maxTabs = parseInt(maxTabsInput.value, 10);
+      const layout: 'vertical' | 'horizontal' =
+        layoutHorizontalInput?.checked === true ? 'horizontal' : 'vertical';
 
       try {
         // 既存の設定を読みだしてマージ
@@ -36,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const settings: SwitcherSettings = {
           ...data.settings,
           maxTabs,
+          layout,
         };
 
         // 保存
@@ -69,12 +77,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // デフォルト値は 9
       const maxTabs = settings.maxTabs !== undefined ? settings.maxTabs : 9;
+      const layout = settings.layout === 'vertical' ? 'vertical' : 'horizontal';
 
       if (maxTabsInput) {
         maxTabsInput.value = String(maxTabs);
       }
       if (maxTabsValLabel) {
         maxTabsValLabel.textContent = String(maxTabs);
+      }
+      if (layoutVerticalInput) {
+        layoutVerticalInput.checked = layout === 'vertical';
+      }
+      if (layoutHorizontalInput) {
+        layoutHorizontalInput.checked = layout === 'horizontal';
       }
     } catch (err) {
       console.error('Failed to load settings:', err);

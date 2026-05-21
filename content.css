@@ -183,3 +183,134 @@
 .rts-item.rts-selected .rts-domain {
   color: rgba(255, 255, 255, 0.55);
 }
+
+/* ============================================
+   横カードレイアウト
+   ============================================ */
+
+.rts-container.rts-layout-horizontal {
+  width: auto;
+  max-width: min(95vw, 960px);
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.18),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.rts-list-horizontal {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 4px;
+}
+
+.rts-list-horizontal::-webkit-scrollbar {
+  height: 6px;
+}
+
+.rts-list-horizontal::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rts-list-horizontal::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+}
+
+.rts-list-horizontal::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.rts-card {
+  flex: 0 0 auto;
+  width: 168px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease;
+}
+
+.rts-card:hover {
+  transform: translateY(-2px);
+}
+
+.rts-card.rts-selected {
+  transform: translateY(-2px);
+}
+
+.rts-card-preview {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(145deg, #f5f5f7 0%, #e8e8ed 100%);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.rts-card-preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.rts-card-preview-favicon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: contain;
+  opacity: 0.85;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.1));
+}
+
+.rts-card-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  transition: background-color 0.12s ease;
+}
+
+.rts-card.rts-selected .rts-card-label {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.rts-card-favicon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.rts-card-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.rts-card.rts-selected .rts-card-title {
+  color: rgba(0, 0, 0, 0.9);
+}
