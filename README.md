@@ -19,7 +19,7 @@ macOS の `Command + Tab` のような操作感で、直近開いたタブを美
 ### ショートカットキーの変更
 
 Chrome の仕様上、`Ctrl + Tab` などブラウザ標準のショートカットは上書きできません。  
-インストール後に [`chrome://extensions/shortcuts`](chrome://extensions/shortcuts) を開き、お好みのキー（例: `Ctrl + Shift + A`）に変更できます。
+インストール後に `[chrome://extensions/shortcuts](chrome://extensions/shortcuts)` を開き、お好みのキー（例: `Ctrl + Shift + A`）に変更できます。
 
 ## 開発
 
@@ -43,12 +43,16 @@ npm run build
 
 ### スクリプト
 
-| コマンド | 説明 |
-| --- | --- |
-| `npm run build` | TypeScript を `dist/` にコンパイル |
-| `npm run watch` | ファイル変更を監視して自動ビルド |
-| `npm run lint` | oxlint でコードを検査 |
-| `npm run format` | oxfmt でコードをフォーマット |
+
+| コマンド             | 説明                          |
+| ---------------- | --------------------------- |
+| `npm run build`  | TypeScript を `dist/` にコンパイル |
+| `npm run watch`  | ファイル変更を監視して自動ビルド            |
+| `npm run lint`   | oxlint でコードを検査              |
+| `npm run format` | oxfmt でコードをフォーマット           |
+| `npm run package` | Chrome Web Store 提出用 ZIP を生成 |
+| `npm run prepare-screenshots` | ストア用スクリーンショットを 1280×800 に変換 |
+
 
 ## プロジェクト構成
 
@@ -65,16 +69,28 @@ npm run build
 
 ## 権限
 
-| 権限 | 用途 |
-| --- | --- |
-| `tabs` | タブ情報の取得と、選択したタブのアクティブ化 |
-| `storage` | ユーザー設定と MRU 順序のローカル保存 |
+
+| 権限        | 用途                     |
+| --------- | ---------------------- |
+| `tabs`    | タブ情報の取得と、選択したタブのアクティブ化 |
+| `storage` | ユーザー設定と MRU 順序のローカル保存  |
+
 
 ## プライバシー
 
 - 個人情報・閲覧履歴・行動データの収集・送信は行いません
 - すべてのデータはローカル（`chrome.storage.local` およびメモリ）でのみ処理されます
 - 外部サーバーとの通信はありません
+- 詳細: [PRIVACY.md](./PRIVACY.md)
+
+## Chrome Web Store への公開
+
+公開手順・申請用文案・スクリーンショットは [CHROMEWEBSTORE.md](./CHROMEWEBSTORE.md) を参照してください。
+
+```bash
+npm run package              # 提出用 ZIP を生成
+npm run prepare-screenshots  # スクリーンショットを 1280×800 に変換
+```
 
 ## ライセンス
 

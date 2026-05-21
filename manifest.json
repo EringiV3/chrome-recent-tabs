@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Recent Tabs Switcher",
+  "name": "Recent Tabs Switcher - Command+Tab風タブ切り替え",
   "version": "1.0.0",
   "description": "macOSのアプリ切り替えのように、直近に開いたタブをオーバーレイで素早く切り替えられます。",
   "permissions": ["tabs", "storage"],
