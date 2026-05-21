@@ -5,6 +5,9 @@ package-lock.json
 # ビルド成果物 (コンパイル後のJS)
 dist/
 
+# ストア提出用 ZIP
+recent-tabs-switcher-v*.zip
+
 # OS一時ファイル
 .DS_Store
 Thumbs.db

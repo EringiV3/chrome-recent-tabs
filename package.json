@@ -8,7 +8,9 @@
     "watch": "tsc -w",
     "lint": "oxlint",
     "format": "oxfmt --write .",
-    "format:check": "oxfmt --check ."
+    "format:check": "oxfmt --check .",
+    "package": "bash scripts/package.sh",
+    "prepare-screenshots": "bash scripts/prepare-screenshots.sh"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.268",
