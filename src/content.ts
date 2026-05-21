@@ -89,6 +89,7 @@ interface Window {
 
     if (customEl) {
       customEl.style.pointerEvents = 'auto'; // UI表示中はクリックイベントを受け取る
+      customEl.style.visibility = 'hidden'; // 初期状態は非表示（チラつき防止）
     }
 
     if (!shadowRoot) return;
@@ -172,17 +173,36 @@ interface Window {
     backdropEl.appendChild(containerEl);
     shadowRoot.appendChild(backdropEl);
 
-    // フェードインアニメーションのトリガー
-    requestAnimationFrame(() => {
-      if (backdropEl) backdropEl.classList.add('rts-show');
-      if (containerEl) containerEl.classList.add('rts-show');
-    });
+    // UIを実際にアクティブにして表示状態にする関数
+    let isShown = false;
+    const showUI = () => {
+      if (isShown || !isOpen) return;
+      isShown = true;
 
-    // イベントリスナーの登録
-    window.addEventListener('keydown', handleKeyDown, true);
-    window.addEventListener('keyup', handleKeyUp, true);
-    window.addEventListener('blur', handleWindowBlur);
-    backdropEl.addEventListener('click', cancelSwitcher);
+      // 表示状態にする
+      if (customEl) {
+        customEl.style.visibility = 'visible';
+      }
+
+      // フェードインアニメーションのトリガー
+      requestAnimationFrame(() => {
+        if (backdropEl) backdropEl.classList.add('rts-show');
+        if (containerEl) containerEl.classList.add('rts-show');
+      });
+
+      // イベントリスナーの登録
+      window.addEventListener('keydown', handleKeyDown, true);
+      window.addEventListener('keyup', handleKeyUp, true);
+      window.addEventListener('blur', handleWindowBlur);
+      if (backdropEl) {
+        backdropEl.addEventListener('click', cancelSwitcher);
+      }
+    };
+
+    // CSSのロード完了で表示
+    linkEl.addEventListener('load', showUI);
+    // 万が一のロードイベント未発火に備え、30ms後に強制表示（キャッシュ時はすでにスタイル適用済みのため安全）
+    setTimeout(showUI, 30);
   }
 
   /**
