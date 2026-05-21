@@ -3,6 +3,7 @@
 interface SwitcherSettings {
   maxTabs?: number;
   theme?: string;
+  layout?: 'vertical' | 'horizontal';
 }
 
 interface TabItem {
@@ -328,10 +329,11 @@ async function getSettings(): Promise<SwitcherSettings> {
     const defaultSettings: SwitcherSettings = {
       maxTabs: 9,
       theme: 'system', // 'system', 'dark', 'light'
+      layout: 'horizontal',
     };
     return { ...defaultSettings, ...data.settings };
   } catch (error) {
     console.error('Failed to get settings:', error);
-    return { maxTabs: 9, theme: 'system' };
+    return { maxTabs: 9, theme: 'system', layout: 'horizontal' };
   }
 }

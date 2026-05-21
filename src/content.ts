@@ -11,6 +11,7 @@ interface TabItem {
 interface SwitcherSettings {
   maxTabs?: number;
   theme?: string;
+  layout?: 'vertical' | 'horizontal';
 }
 
 (function () {
@@ -26,6 +27,7 @@ interface SwitcherSettings {
   let selectedIndex = 0;
   let isOpen = false;
   let openedTime = 0;
+  let layoutMode: 'vertical' | 'horizontal' = 'horizontal';
 
   // デフォルトファビコン（マテリアルアイコン風の綺麗なプレースホルダーSVGデータURL）
   const DEFAULT_FAVICON =
@@ -49,10 +51,11 @@ interface SwitcherSettings {
   /**
    * スイッチャーUIを構築して表示する
    */
-  function openSwitcher(tabs: TabItem[], _settings: SwitcherSettings): void {
+  function openSwitcher(tabs: TabItem[], settings: SwitcherSettings): void {
     if (tabs.length === 0) return;
 
     tabList = tabs;
+    layoutMode = settings.layout === 'vertical' ? 'vertical' : 'horizontal';
 
     // デフォルトで「1つ前に開いていたタブ」（インデックス1）を選択状態にする。
     // タブが1つの場合はインデックス0を選択する。
@@ -104,70 +107,18 @@ interface SwitcherSettings {
 
     // スイッチャーコンテナ
     containerEl = document.createElement('div');
-    containerEl.className = 'rts-container';
+    containerEl.className =
+      layoutMode === 'horizontal' ? 'rts-container rts-layout-horizontal' : 'rts-container';
     containerEl.setAttribute('role', 'dialog');
     containerEl.setAttribute('aria-modal', 'true');
     containerEl.setAttribute('aria-label', 'Recent Tabs Switcher');
 
-    // ヘッダー
-    const headerEl = document.createElement('div');
-    headerEl.className = 'rts-header';
-    headerEl.textContent = 'Recent Tabs';
-    containerEl.appendChild(headerEl);
+    if (layoutMode === 'vertical') {
+      buildVerticalLayout(containerEl, tabs);
+    } else {
+      buildHorizontalLayout(containerEl, tabs);
+    }
 
-    // タブリストコンテナ
-    const listEl = document.createElement('div');
-    listEl.className = 'rts-list';
-
-    tabElements = [];
-
-    tabs.forEach((tab, index) => {
-      const itemEl = document.createElement('div');
-      itemEl.className = `rts-item${index === selectedIndex ? ' rts-selected' : ''}`;
-      itemEl.setAttribute('data-index', String(index));
-      itemEl.setAttribute('data-tab-id', String(tab.id));
-
-      // ファビコン
-      const favEl = document.createElement('img');
-      favEl.className = 'rts-favicon';
-      favEl.src = tab.favIconUrl || DEFAULT_FAVICON;
-      favEl.alt = '';
-      favEl.onerror = () => {
-        favEl.src = DEFAULT_FAVICON;
-      };
-      itemEl.appendChild(favEl);
-
-      // メタデータ（タイトル・ドメイン）
-      const metaEl = document.createElement('div');
-      metaEl.className = 'rts-meta';
-
-      const titleEl = document.createElement('span');
-      titleEl.className = 'rts-title';
-      titleEl.textContent = tab.title;
-      metaEl.appendChild(titleEl);
-
-      const domainEl = document.createElement('span');
-      domainEl.className = 'rts-domain';
-      domainEl.textContent = getDomainName(tab.url);
-      metaEl.appendChild(domainEl);
-
-      itemEl.appendChild(metaEl);
-
-      // マウス操作用イベント
-      itemEl.addEventListener('mouseenter', () => {
-        updateSelection(index);
-      });
-
-      itemEl.addEventListener('click', (e) => {
-        e.stopPropagation();
-        confirmSelection(tab.id);
-      });
-
-      listEl.appendChild(itemEl);
-      tabElements.push(itemEl);
-    });
-
-    containerEl.appendChild(listEl);
     backdropEl.appendChild(containerEl);
     shadowRoot.appendChild(backdropEl);
 
@@ -200,6 +151,127 @@ interface SwitcherSettings {
   }
 
   /**
+   * 縦リストレイアウトを構築する
+   */
+  function buildVerticalLayout(container: HTMLDivElement, tabs: TabItem[]): void {
+    const headerEl = document.createElement('div');
+    headerEl.className = 'rts-header';
+    headerEl.textContent = 'Recent Tabs';
+    container.appendChild(headerEl);
+
+    const listEl = document.createElement('div');
+    listEl.className = 'rts-list';
+
+    tabElements = [];
+
+    tabs.forEach((tab, index) => {
+      const itemEl = document.createElement('div');
+      itemEl.className = `rts-item${index === selectedIndex ? ' rts-selected' : ''}`;
+      itemEl.setAttribute('data-index', String(index));
+      itemEl.setAttribute('data-tab-id', String(tab.id));
+
+      const favEl = document.createElement('img');
+      favEl.className = 'rts-favicon';
+      favEl.src = tab.favIconUrl || DEFAULT_FAVICON;
+      favEl.alt = '';
+      favEl.onerror = () => {
+        favEl.src = DEFAULT_FAVICON;
+      };
+      itemEl.appendChild(favEl);
+
+      const metaEl = document.createElement('div');
+      metaEl.className = 'rts-meta';
+
+      const titleEl = document.createElement('span');
+      titleEl.className = 'rts-title';
+      titleEl.textContent = tab.title;
+      metaEl.appendChild(titleEl);
+
+      const domainEl = document.createElement('span');
+      domainEl.className = 'rts-domain';
+      domainEl.textContent = getDomainName(tab.url);
+      metaEl.appendChild(domainEl);
+
+      itemEl.appendChild(metaEl);
+      attachItemEvents(itemEl, index, tab.id);
+
+      listEl.appendChild(itemEl);
+      tabElements.push(itemEl);
+    });
+
+    container.appendChild(listEl);
+  }
+
+  /**
+   * 横カードレイアウトを構築する
+   */
+  function buildHorizontalLayout(container: HTMLDivElement, tabs: TabItem[]): void {
+    const listEl = document.createElement('div');
+    listEl.className = 'rts-list rts-list-horizontal';
+
+    tabElements = [];
+
+    tabs.forEach((tab, index) => {
+      const itemEl = document.createElement('div');
+      itemEl.className = `rts-card${index === selectedIndex ? ' rts-selected' : ''}`;
+      itemEl.setAttribute('data-index', String(index));
+      itemEl.setAttribute('data-tab-id', String(tab.id));
+
+      const previewEl = document.createElement('div');
+      previewEl.className = 'rts-card-preview';
+
+      const previewFavEl = document.createElement('img');
+      previewFavEl.className = 'rts-card-preview-favicon';
+      previewFavEl.src = tab.favIconUrl || DEFAULT_FAVICON;
+      previewFavEl.alt = '';
+      previewFavEl.onerror = () => {
+        previewFavEl.src = DEFAULT_FAVICON;
+      };
+      previewEl.appendChild(previewFavEl);
+      itemEl.appendChild(previewEl);
+
+      const labelEl = document.createElement('div');
+      labelEl.className = 'rts-card-label';
+
+      const favEl = document.createElement('img');
+      favEl.className = 'rts-card-favicon';
+      favEl.src = tab.favIconUrl || DEFAULT_FAVICON;
+      favEl.alt = '';
+      favEl.onerror = () => {
+        favEl.src = DEFAULT_FAVICON;
+      };
+      labelEl.appendChild(favEl);
+
+      const titleEl = document.createElement('span');
+      titleEl.className = 'rts-card-title';
+      titleEl.textContent = getDisplayTitle(tab);
+      labelEl.appendChild(titleEl);
+
+      itemEl.appendChild(labelEl);
+      attachItemEvents(itemEl, index, tab.id);
+
+      listEl.appendChild(itemEl);
+      tabElements.push(itemEl);
+    });
+
+    container.appendChild(listEl);
+  }
+
+  /**
+   * タブアイテムに共通のマウスイベントを付与する
+   */
+  function attachItemEvents(itemEl: HTMLDivElement, index: number, tabId: number): void {
+    itemEl.addEventListener('mouseenter', () => {
+      updateSelection(index);
+    });
+
+    itemEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      confirmSelection(tabId);
+    });
+  }
+
+  /**
    * URLからドメイン名を抽出する（読みやすさ向上のため）
    */
   function getDomainName(urlStr: string): string {
@@ -214,6 +286,17 @@ interface SwitcherSettings {
     } catch {
       return urlStr;
     }
+  }
+
+  /**
+   * 横レイアウト用の表示タイトルを取得する
+   */
+  function getDisplayTitle(tab: TabItem): string {
+    const domain = getDomainName(tab.url);
+    if (domain && tab.title && !tab.title.toLowerCase().includes(domain.split('.')[0])) {
+      return tab.title;
+    }
+    return tab.title || domain || 'Untitled';
   }
 
   /**
@@ -234,7 +317,11 @@ interface SwitcherSettings {
     if (newSelectedEl) {
       newSelectedEl.classList.add('rts-selected');
       // スクロール追従（コンテナからはみ出す場合）
-      newSelectedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      newSelectedEl.scrollIntoView({
+        block: 'nearest',
+        inline: 'nearest',
+        behavior: 'smooth',
+      });
     }
   }
 
@@ -323,14 +410,23 @@ interface SwitcherSettings {
       return;
     }
 
-    // 矢印キーでの移動
-    if (event.key === 'ArrowDown') {
-      selectNext();
-    } else if (event.key === 'ArrowUp') {
-      selectPrevious();
+    // レイアウトに応じた矢印キーでの移動
+    if (layoutMode === 'horizontal') {
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        selectNext();
+      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        selectPrevious();
+      }
+    } else {
+      if (event.key === 'ArrowDown') {
+        selectNext();
+      } else if (event.key === 'ArrowUp') {
+        selectPrevious();
+      }
     }
+
     // Tabキーでの移動
-    else if (event.key === 'Tab') {
+    if (event.key === 'Tab') {
       if (event.shiftKey) {
         selectPrevious();
       } else {
