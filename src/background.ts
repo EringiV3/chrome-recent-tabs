@@ -74,7 +74,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     })();
     return true; // 非同期レスポンスのためにチャネルを維持
   }
-  
+
   if (message.action === 'get_settings') {
     (async () => {
       const settings = await getSettings();
@@ -93,21 +93,21 @@ async function initializeHistory(): Promise<void> {
   try {
     // 全ウィンドウのすべてのタブを取得
     const allTabs = await chrome.tabs.query({});
-    
+
     // 現在アクティブなタブを特定
     const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
+
     const mruList: number[] = [];
     if (activeTab && activeTab.id !== undefined) {
       mruList.push(activeTab.id);
     }
-    
+
     for (const tab of allTabs) {
       if (tab.id === undefined) continue;
       if (activeTab && tab.id === activeTab.id) continue;
       mruList.push(tab.id);
     }
-    
+
     await chrome.storage.local.set({ mruTabIds: mruList });
     console.log('MRU History initialized:', mruList);
   } catch (error) {
@@ -126,13 +126,13 @@ async function updateHistoryOnTabActivated(tabId: number): Promise<void> {
   try {
     const data = await chrome.storage.local.get('mruTabIds');
     let mruList: number[] = data.mruTabIds || [];
-    
+
     // 既存のリストから該当タブIDを削除
-    mruList = mruList.filter(id => id !== tabId);
-    
+    mruList = mruList.filter((id) => id !== tabId);
+
     // リストの先頭に追加
     mruList.unshift(tabId);
-    
+
     await chrome.storage.local.set({ mruTabIds: mruList });
   } catch (error) {
     console.error('Failed to update MRU history on activation:', error);
@@ -148,7 +148,7 @@ async function removeTabFromHistory(tabId: number): Promise<void> {
   try {
     const data = await chrome.storage.local.get('mruTabIds');
     let mruList: number[] = data.mruTabIds || [];
-    mruList = mruList.filter(id => id !== tabId);
+    mruList = mruList.filter((id) => id !== tabId);
     await chrome.storage.local.set({ mruTabIds: mruList });
   } catch (error) {
     console.error('Failed to remove tab from MRU history:', error);
@@ -180,15 +180,15 @@ async function handleOpenSwitcherCommand(): Promise<void> {
     // 現在のアクティブタブを取得
     const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!activeTab || activeTab.id === undefined) return;
-    
+
     // 最新の設定情報を取得
     const settings = await getSettings();
     const maxTabsToShow = settings.maxTabs || 9;
-    
+
     // 有効なタブのリストをMRU順に構築
     const data = await chrome.storage.local.get('mruTabIds');
     const mruList: number[] = data.mruTabIds || [];
-    
+
     // 現在開いているすべてのタブを取得し、インデックス化
     const openTabs = await chrome.tabs.query({});
     const openTabsMap = new Map<number, chrome.tabs.Tab>();
@@ -197,11 +197,11 @@ async function handleOpenSwitcherCommand(): Promise<void> {
         openTabsMap.set(tab.id, tab);
       }
     }
-    
+
     // MRUリストを開いているタブのみでフィルタリングしてタブ情報を詰める
     const sortedTabs: TabItem[] = [];
     const validMruIds: number[] = [];
-    
+
     for (const tabId of mruList) {
       const tab = openTabsMap.get(tabId);
       if (tab && tab.id !== undefined) {
@@ -212,11 +212,11 @@ async function handleOpenSwitcherCommand(): Promise<void> {
           title: tab.title || 'Untitled',
           url: tab.url || '',
           favIconUrl: tab.favIconUrl || '',
-          active: tab.id === activeTab.id
+          active: tab.id === activeTab.id,
         });
       }
     }
-    
+
     // 開いているがMRUリストに載っていないタブがあれば最後尾に追加（不整合対策）
     for (const tab of openTabs) {
       if (tab.id === undefined) continue;
@@ -227,36 +227,39 @@ async function handleOpenSwitcherCommand(): Promise<void> {
           title: tab.title || 'Untitled',
           url: tab.url || '',
           favIconUrl: tab.favIconUrl || '',
-          active: tab.id === activeTab.id
+          active: tab.id === activeTab.id,
         });
       }
     }
-    
+
     // MRUリストを更新して同期を取る
     await chrome.storage.local.set({ mruTabIds: validMruIds });
-    
+
     // UIで表示するタブ数を制限（最大値）
     const displayTabs = sortedTabs.slice(0, maxTabsToShow);
-    
+
     // アクティブなタブが特権ページ（chrome:// や chrome-extension:// 等）であるかチェック
     const isSpecialPage = isChromeInternalPage(activeTab.url);
-    
+
     if (isSpecialPage) {
       // 特権ページの場合はコンテンツスクリプトが動かないため、1つ前に開いていたタブへ即座に切り替える（フォールバックトグル）
       await fallbackToggleTab(validMruIds, activeTab.id);
       return;
     }
-    
+
     // コンテンツスクリプトへメッセージ送信
     try {
       await chrome.tabs.sendMessage(activeTab.id, {
         action: 'open_switcher_ui',
         tabs: displayTabs,
-        settings: settings
+        settings: settings,
       });
     } catch (msgError) {
       // コンテンツスクリプトが未ロード、またはセキュリティポリシーで失敗した場合のフォールバック
-      console.warn('Could not communicate with content script. Falling back to direct toggle:', msgError);
+      console.warn(
+        'Could not communicate with content script. Falling back to direct toggle:',
+        msgError,
+      );
       await fallbackToggleTab(validMruIds, activeTab.id);
     }
   } catch (error) {
@@ -270,10 +273,10 @@ async function handleOpenSwitcherCommand(): Promise<void> {
  */
 async function fallbackToggleTab(mruList: number[], currentTabId: number): Promise<void> {
   if (mruList.length < 2) return; // 切り替える先がない
-  
+
   // 現在のアクティブタブを除外したMRUリストの先頭（＝1つ前に開いていたタブ）を取得
   const nextTabId = mruList[0] === currentTabId ? mruList[1] : mruList[0];
-  
+
   if (nextTabId) {
     await switchToTab(nextTabId);
   }
@@ -301,10 +304,10 @@ async function switchToTab(tabId: number): Promise<void> {
   try {
     const tab = await chrome.tabs.get(tabId);
     if (!tab) return;
-    
+
     // タブをアクティブ化
     await chrome.tabs.update(tabId, { active: true });
-    
+
     // タブが属するウィンドウもフォーカスする
     if (tab.windowId !== undefined) {
       await chrome.windows.update(tab.windowId, { focused: true });
@@ -324,7 +327,7 @@ async function getSettings(): Promise<SwitcherSettings> {
     const data = await chrome.storage.local.get('settings');
     const defaultSettings: SwitcherSettings = {
       maxTabs: 9,
-      theme: 'system' // 'system', 'dark', 'light'
+      theme: 'system', // 'system', 'dark', 'light'
     };
     return { ...defaultSettings, ...(data.settings || {}) };
   } catch (error) {

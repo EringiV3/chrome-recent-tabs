@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const maxTabsValLabel = document.getElementById('max-tabs-val') as HTMLSpanElement | null;
   const saveBtn = document.getElementById('save-btn') as HTMLButtonElement | null;
   const statusEl = document.getElementById('status') as HTMLDivElement | null;
-  const openShortcutBtn = document.getElementById('open-shortcut-settings') as HTMLButtonElement | null;
+  const openShortcutBtn = document.getElementById(
+    'open-shortcut-settings',
+  ) as HTMLButtonElement | null;
 
   // 初期設定のロード
   await loadSettings();
@@ -27,18 +29,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (saveBtn && maxTabsInput) {
     saveBtn.addEventListener('click', async () => {
       const maxTabs = parseInt(maxTabsInput.value, 10);
-      
+
       try {
         // 既存の設定を読みだしてマージ
         const data = await chrome.storage.local.get('settings');
         const settings: SwitcherSettings = {
           ...(data.settings || {}),
-          maxTabs
+          maxTabs,
         };
-        
+
         // 保存
         await chrome.storage.local.set({ settings });
-        
+
         // 成功トースト表示
         showStatus('設定を保存しました');
       } catch (err) {
@@ -52,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (openShortcutBtn) {
     openShortcutBtn.addEventListener('click', () => {
       chrome.tabs.create({
-        url: 'chrome://extensions/shortcuts'
+        url: 'chrome://extensions/shortcuts',
       });
     });
   }
@@ -64,10 +66,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const data = await chrome.storage.local.get('settings');
       const settings = (data.settings || {}) as SwitcherSettings;
-      
+
       // デフォルト値は 9
       const maxTabs = settings.maxTabs !== undefined ? settings.maxTabs : 9;
-      
+
       if (maxTabsInput) {
         maxTabsInput.value = String(maxTabs);
       }
@@ -87,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     statusEl.textContent = message;
     statusEl.style.color = isError ? '#ef4444' : '#10b981';
     statusEl.classList.add('show');
-    
+
     setTimeout(() => {
       statusEl.classList.remove('show');
     }, 2000);

@@ -1,261 +1,280 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>Recent Tabs Switcher - 設定</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-color: #0e0e11;
-      --card-bg: rgba(22, 22, 28, 0.65);
-      --border-color: rgba(255, 255, 255, 0.08);
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --accent: #a5b4fc;
-      --success: #10b981;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <title>Recent Tabs Switcher - 設定</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-color: #0e0e11;
+        --card-bg: rgba(22, 22, 28, 0.65);
+        --border-color: rgba(255, 255, 255, 0.08);
+        --text-main: #f3f4f6;
+        --text-muted: #9ca3af;
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --accent: #a5b4fc;
+        --success: #10b981;
+      }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(165, 180, 252, 0.05) 0%, transparent 45%);
-    }
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        font-family:
+          'Outfit',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-image:
+          radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+          radial-gradient(circle at 90% 80%, rgba(165, 180, 252, 0.05) 0%, transparent 45%);
+      }
 
-    .wrapper {
-      width: 500px;
-      max-width: 90vw;
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--border-color);
-      border-radius: 24px;
-      padding: 32px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    }
+      .wrapper {
+        width: 500px;
+        max-width: 90vw;
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow:
+          0 25px 60px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
 
-    header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
+      header {
+        text-align: center;
+        margin-bottom: 32px;
+      }
 
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
-      margin: 0 0 8px 0;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #ffffff 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 8px 0;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #ffffff 0%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
 
-    .desc {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin: 0;
-      line-height: 1.5;
-    }
+      .desc {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin: 0;
+        line-height: 1.5;
+      }
 
-    .setting-group {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      margin-bottom: 32px;
-    }
+      .setting-group {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 32px;
+      }
 
-    .setting-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 16px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      transition: border-color 0.2s ease;
-    }
+      .setting-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 16px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: border-color 0.2s ease;
+      }
 
-    .setting-card:hover {
-      border-color: rgba(99, 102, 241, 0.2);
-    }
+      .setting-card:hover {
+        border-color: rgba(99, 102, 241, 0.2);
+      }
 
-    .setting-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+      .setting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-    label {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-main);
-    }
+      label {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-main);
+      }
 
-    .setting-desc {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin: 0;
-      line-height: 1.4;
-    }
+      .setting-desc {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin: 0;
+        line-height: 1.4;
+      }
 
-    .val-display {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--accent);
-      min-width: 24px;
-      text-align: right;
-    }
+      .val-display {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--accent);
+        min-width: 24px;
+        text-align: right;
+      }
 
-    /* カスタムスライダー */
-    .slider-container {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-    }
+      /* カスタムスライダー */
+      .slider-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+      }
 
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: rgba(255, 255, 255, 0.1);
-      outline: none;
-    }
+      input[type='range'] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        outline: none;
+      }
 
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--primary);
-      cursor: pointer;
-      transition: transform 0.1s ease, background-color 0.2s ease;
-      box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
-    }
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--primary);
+        cursor: pointer;
+        transition:
+          transform 0.1s ease,
+          background-color 0.2s ease;
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+      }
 
-    input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.15);
-      background: var(--accent);
-    }
+      input[type='range']::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+        background: var(--accent);
+      }
 
-    /* ボタン類 */
-    .btn {
-      background: var(--primary);
-      color: #ffffff;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 20px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
-      text-decoration: none;
-    }
+      /* ボタン類 */
+      .btn {
+        background: var(--primary);
+        color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+        text-decoration: none;
+      }
 
-    .btn:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-    }
+      .btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+      }
 
-    .btn:active {
-      transform: translateY(1px);
-    }
+      .btn:active {
+        transform: translateY(1px);
+      }
 
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-main);
-      box-shadow: none;
-    }
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--text-main);
+        box-shadow: none;
+      }
 
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-      box-shadow: none;
-    }
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: none;
+      }
 
-    .actions-footer {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+      .actions-footer {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
 
-    .save-status {
-      text-align: center;
-      font-size: 13px;
-      height: 18px;
-      color: var(--success);
-      font-weight: 500;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
+      .save-status {
+        text-align: center;
+        font-size: 13px;
+        height: 18px;
+        color: var(--success);
+        font-weight: 500;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
 
-    .save-status.show {
-      opacity: 1;
-    }
-  </style>
-</head>
-<body>
-  <div class="wrapper">
-    <header>
-      <h1>Recent Tabs Switcher</h1>
-      <p class="desc">macOSのアプリ切り替えのような快適なタブ選択を提供します</p>
-    </header>
+      .save-status.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Recent Tabs Switcher</h1>
+        <p class="desc">macOSのアプリ切り替えのような快適なタブ選択を提供します</p>
+      </header>
 
-    <main>
-      <div class="setting-group">
-        <!-- 表示タブ数設定 -->
-        <div class="setting-card">
-          <div class="setting-row">
-            <label for="max-tabs">最大表示タブ数</label>
-            <span class="val-display" id="max-tabs-val">9</span>
+      <main>
+        <div class="setting-group">
+          <!-- 表示タブ数設定 -->
+          <div class="setting-card">
+            <div class="setting-row">
+              <label for="max-tabs">最大表示タブ数</label>
+              <span class="val-display" id="max-tabs-val">9</span>
+            </div>
+            <p class="setting-desc">
+              切り替え画面（オーバーレイ）に表示する直近開いたタブの最大数です。
+            </p>
+            <div class="slider-container">
+              <input type="range" id="max-tabs" min="5" max="20" step="1" value="9" />
+            </div>
           </div>
-          <p class="setting-desc">切り替え画面（オーバーレイ）に表示する直近開いたタブの最大数です。</p>
-          <div class="slider-container">
-            <input type="range" id="max-tabs" min="5" max="20" step="1" value="9">
+
+          <!-- ショートカット説明カード -->
+          <div class="setting-card">
+            <div class="setting-row">
+              <label>ショートカット設定</label>
+            </div>
+            <p class="setting-desc">
+              デフォルトの起動キーは <strong>Alt + Q</strong> (Macは <strong>Option + Q</strong>)
+              です。Chromeの設定ページから好みのショートカット（例:
+              <strong>Option + Tab</strong>など）に変更可能です。
+            </p>
+            <div style="margin-top: 4px">
+              <button id="open-shortcut-settings" class="btn btn-secondary btn-sm" type="button">
+                ショートカット設定ページを開く
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- ショートカット説明カード -->
-        <div class="setting-card">
-          <div class="setting-row">
-            <label>ショートカット設定</label>
-          </div>
-          <p class="setting-desc">デフォルトの起動キーは <strong>Alt + Q</strong> (Macは <strong>Option + Q</strong>) です。Chromeの設定ページから好みのショートカット（例: <strong>Option + Tab</strong>など）に変更可能です。</p>
-          <div style="margin-top: 4px;">
-            <button id="open-shortcut-settings" class="btn btn-secondary btn-sm" type="button">
-              ショートカット設定ページを開く
-            </button>
-          </div>
+        <div class="actions-footer">
+          <button id="save-btn" class="btn" type="button">設定を保存</button>
+          <div id="status" class="save-status">設定を保存しました</div>
         </div>
-      </div>
-
-      <div class="actions-footer">
-        <button id="save-btn" class="btn" type="button">設定を保存</button>
-        <div id="status" class="save-status">設定を保存しました</div>
-      </div>
-    </main>
-  </div>
-  <script src="dist/options.js"></script>
-</body>
+      </main>
+    </div>
+    <script src="dist/options.js"></script>
+  </body>
 </html>

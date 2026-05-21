@@ -3,10 +3,7 @@
   "name": "Recent Tabs Switcher",
   "version": "1.0.0",
   "description": "Switch between recently active tabs using an elegant overlay, similar to macOS App Switcher.",
-  "permissions": [
-    "tabs",
-    "storage"
-  ],
+  "permissions": ["tabs", "storage"],
   "background": {
     "service_worker": "dist/background.js"
   },
@@ -21,16 +18,9 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "js": [
-        "dist/content.js"
-      ],
-      "css": [
-        "content.css"
-      ],
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["dist/content.js"],
+      "css": ["content.css"],
       "run_at": "document_start"
     }
   ],
