@@ -329,7 +329,7 @@ async function getSettings(): Promise<SwitcherSettings> {
       maxTabs: 9,
       theme: 'system', // 'system', 'dark', 'light'
     };
-    return { ...defaultSettings, ...(data.settings || {}) };
+    return { ...defaultSettings, ...data.settings };
   } catch (error) {
     console.error('Failed to get settings:', error);
     return { maxTabs: 9, theme: 'system' };

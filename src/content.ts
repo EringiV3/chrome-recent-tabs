@@ -13,15 +13,10 @@ interface SwitcherSettings {
   theme?: string;
 }
 
-// グローバルウィンドウオブジェクトの型拡張
-interface Window {
-  RecentTabsSwitcherLoaded?: boolean;
-}
-
 (function () {
   // すでにコンテンツスクリプトが読み込まれている場合は重複実行を防ぐ
-  if (window.RecentTabsSwitcherLoaded) return;
-  window.RecentTabsSwitcherLoaded = true;
+  if ((window as any).RecentTabsSwitcherLoaded) return;
+  (window as any).RecentTabsSwitcherLoaded = true;
 
   let shadowRoot: ShadowRoot | null = null;
   let containerEl: HTMLDivElement | null = null;
@@ -30,6 +25,7 @@ interface Window {
   let tabList: TabItem[] = [];
   let selectedIndex = 0;
   let isOpen = false;
+  let openedTime = 0;
 
   // デフォルトファビコン（マテリアルアイコン風の綺麗なプレースホルダーSVGデータURL）
   const DEFAULT_FAVICON =
@@ -58,6 +54,7 @@ interface Window {
 
     tabList = tabs;
     isOpen = true;
+    openedTime = Date.now();
 
     // デフォルトで「1つ前に開いていたタブ」（インデックス1）を選択状態にする。
     // タブが1つの場合はインデックス0を選択する。
@@ -217,7 +214,7 @@ interface Window {
         return `${url.protocol}//${url.hostname}`;
       }
       return url.hostname.replace('www.', '');
-    } catch (e) {
+    } catch {
       return urlStr;
     }
   }
@@ -368,6 +365,10 @@ interface Window {
     // Altキー（モディファイア）が離されたら決定する
     // MacOSのOptionキーは 'Alt' として判定される
     if (event.key === 'Alt') {
+      // 起動直後 150ms 以内の keyup は、ショートカット入力自体の残響（誤検知）として無視する
+      if (Date.now() - openedTime < 150) {
+        return;
+      }
       confirmSelection();
     }
   }
@@ -377,6 +378,10 @@ interface Window {
    * キーイベントのロストを防ぐため、安全にスイッチャーを閉じる
    */
   function handleWindowBlur(): void {
+    // 起動直後 150ms 以内の blur は、ショートカット起動に伴うウィンドウフォーカスの揺らぎとして無視する
+    if (Date.now() - openedTime < 150) {
+      return;
+    }
     cancelSwitcher();
   }
 })();

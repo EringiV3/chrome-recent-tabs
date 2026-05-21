@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 既存の設定を読みだしてマージ
         const data = await chrome.storage.local.get('settings');
         const settings: SwitcherSettings = {
-          ...(data.settings || {}),
+          ...data.settings,
           maxTabs,
         };
 
