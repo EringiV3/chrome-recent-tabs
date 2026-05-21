@@ -26,6 +26,8 @@ interface SwitcherSettings {
   let selectedIndex = 0;
   let isOpen = false;
   let openedTime = 0;
+  let isAltPressed = false;
+  let lastAltReleasedTime = 0;
 
   // デフォルトファビコン（マテリアルアイコン風の綺麗なプレースホルダーSVGデータURL）
   const DEFAULT_FAVICON =
@@ -53,12 +55,25 @@ interface SwitcherSettings {
     if (tabs.length === 0) return;
 
     tabList = tabs;
-    isOpen = true;
-    openedTime = Date.now();
 
     // デフォルトで「1つ前に開いていたタブ」（インデックス1）を選択状態にする。
     // タブが1つの場合はインデックス0を選択する。
     selectedIndex = tabs.length > 1 ? 1 : 0;
+
+    // メッセージ受信時にすでにAltキーが離されているか、または直前に離された場合は、
+    // ユーザーが素早く「押してすぐ離した（一発切り替え）」とみなす。
+    const now = Date.now();
+    const isQuickToggle = !isAltPressed || now - lastAltReleasedTime < 200;
+
+    if (isQuickToggle) {
+      // モーダルを表示せず、即座にターゲットタブに切り替えて終了する
+      const targetTabId = tabs[selectedIndex].id;
+      chrome.runtime.sendMessage({ action: 'switch_to_tab', tabId: targetTabId });
+      return;
+    }
+
+    isOpen = true;
+    openedTime = now;
 
     // カスタムエレメントの作成または取得
     let customEl = document.getElementById('recent-tabs-switcher-root') as HTMLElement | null;
@@ -170,10 +185,6 @@ interface SwitcherSettings {
     backdropEl.appendChild(containerEl);
     shadowRoot.appendChild(backdropEl);
 
-    // イベントリスナーの登録（キー操作を同期的に即座にキャプチャ開始）
-    window.addEventListener('keydown', handleKeyDown, true);
-    window.addEventListener('keyup', handleKeyUp, true);
-    window.addEventListener('blur', handleWindowBlur);
     if (backdropEl) {
       backdropEl.addEventListener('click', cancelSwitcher);
     }
@@ -284,11 +295,6 @@ interface SwitcherSettings {
 
     isOpen = false;
 
-    // リスナー解除
-    window.removeEventListener('keydown', handleKeyDown, true);
-    window.removeEventListener('keyup', handleKeyUp, true);
-    window.removeEventListener('blur', handleWindowBlur);
-
     if (backdropEl && containerEl) {
       // フェードアウトアニメーションの開始
       backdropEl.classList.remove('rts-show');
@@ -311,16 +317,21 @@ interface SwitcherSettings {
    * キーボードのキー押下時のハンドラー（キャプチャリングフェーズで実行）
    */
   function handleKeyDown(event: KeyboardEvent): void {
+    const key = event.key;
+    if (key === 'Alt') {
+      isAltPressed = true;
+    }
+
     if (!isOpen) return;
 
     // イベントがスイッチャーに向けられていることを示すため伝播停止
     event.stopPropagation();
     event.preventDefault();
 
-    const key = event.key.toLowerCase();
+    const keyLower = key.toLowerCase();
 
     // Alt + Q (またはOption + Q) による移動
-    if (key === 'q' && event.altKey) {
+    if (keyLower === 'q' && event.altKey) {
       if (event.shiftKey) {
         selectPrevious();
       } else {
@@ -357,6 +368,12 @@ interface SwitcherSettings {
    * キーボードのキー解放時のハンドラー
    */
   function handleKeyUp(event: KeyboardEvent): void {
+    const key = event.key;
+    if (key === 'Alt') {
+      isAltPressed = false;
+      lastAltReleasedTime = Date.now();
+    }
+
     if (!isOpen) return;
 
     event.stopPropagation();
@@ -364,7 +381,7 @@ interface SwitcherSettings {
 
     // Altキー（モディファイア）が離されたら決定する
     // MacOSのOptionキーは 'Alt' として判定される
-    if (event.key === 'Alt') {
+    if (key === 'Alt') {
       // 起動直後 150ms 以内の keyup は、ショートカット入力自体の残響（誤検知）として無視する
       if (Date.now() - openedTime < 150) {
         return;
@@ -378,10 +395,18 @@ interface SwitcherSettings {
    * キーイベントのロストを防ぐため、安全にスイッチャーを閉じる
    */
   function handleWindowBlur(): void {
+    isAltPressed = false;
+    if (!isOpen) return;
+
     // 起動直後 150ms 以内の blur は、ショートカット起動に伴うウィンドウフォーカスの揺らぎとして無視する
     if (Date.now() - openedTime < 150) {
       return;
     }
     cancelSwitcher();
   }
+
+  // 常時監視リスナーの登録（通信ラグ中のキーイベントも取りこぼさないため）
+  window.addEventListener('keydown', handleKeyDown, true);
+  window.addEventListener('keyup', handleKeyUp, true);
+  window.addEventListener('blur', handleWindowBlur);
 })();
