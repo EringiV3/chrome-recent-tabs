@@ -173,6 +173,14 @@ interface Window {
     backdropEl.appendChild(containerEl);
     shadowRoot.appendChild(backdropEl);
 
+    // イベントリスナーの登録（キー操作を同期的に即座にキャプチャ開始）
+    window.addEventListener('keydown', handleKeyDown, true);
+    window.addEventListener('keyup', handleKeyUp, true);
+    window.addEventListener('blur', handleWindowBlur);
+    if (backdropEl) {
+      backdropEl.addEventListener('click', cancelSwitcher);
+    }
+
     // UIを実際にアクティブにして表示状態にする関数
     let isShown = false;
     const showUI = () => {
@@ -189,14 +197,6 @@ interface Window {
         if (backdropEl) backdropEl.classList.add('rts-show');
         if (containerEl) containerEl.classList.add('rts-show');
       });
-
-      // イベントリスナーの登録
-      window.addEventListener('keydown', handleKeyDown, true);
-      window.addEventListener('keyup', handleKeyUp, true);
-      window.addEventListener('blur', handleWindowBlur);
-      if (backdropEl) {
-        backdropEl.addEventListener('click', cancelSwitcher);
-      }
     };
 
     // CSSのロード完了で表示
